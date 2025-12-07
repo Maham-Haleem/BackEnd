@@ -1,4 +1,4 @@
-import express from "express";
+/*import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
@@ -45,6 +45,87 @@ app.listen(PORT, () => {
   const baseUrl = `http://localhost:${PORT}`;
   console.log("\n" + "=".repeat(50));
   console.log(`Server is running!`);
+  console.log("=".repeat(50));
+  console.log(` Server URL: ${baseUrl}`);
+  console.log("\n Available Endpoints:");
+  console.log(`   • GET  ${baseUrl}/`);
+  console.log(`   • POST ${baseUrl}/api/student/register`);
+  console.log(`   • POST ${baseUrl}/api/student/login`);
+  console.log(`   • POST ${baseUrl}/api/student/verify`);
+  console.log(`   • GET  ${baseUrl}/api/student/getStudent/:email`);
+  console.log(`   • PUT  ${baseUrl}/api/student/updateProfile`);
+  console.log(`   • POST ${baseUrl}/api/student/upload-cv/:email`);
+  console.log(`   • GET  ${baseUrl}/api/student/recommendations/:email`);
+  console.log(`   • POST ${baseUrl}/api/student/apply-internship`);
+  console.log(`   • GET  ${baseUrl}/api/student/my-applications/:email`);
+  console.log("=".repeat(50) + "\n");
+});*/
+
+
+
+
+
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+
+import studentRoutes from "./student/routes/studentRoutes.js";
+import aiRoutes from "./student/routes/aiRoutes.js";
+import mouRoutes from "./routes/mou.routes.js";
+
+import dotenv from "dotenv";
+
+// Load .env file
+dotenv.config({ path: "./.env" });
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(cors());
+
+// Static folders
+app.use("/uploads", express.static("uploads"));
+app.use("/uploads/profile", express.static("uploads/profile"));
+app.use("/uploads/cv", express.static("uploads/cv"));
+
+// Routes
+app.use("/api/mou", mouRoutes);
+app.use("/api/student", studentRoutes);
+app.use("/api/ai", aiRoutes);
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "✅ Server is running",
+    endpoints: ["/api/student", "/api/ai", "/api/mou"],
+  });
+});
+
+// Debug: print MongoDB URI (remove this after testing)
+console.log("MONGO_URI loaded:", process.env.MONGO_URI ? "✅ Found" : "❌ Missing");
+
+// Check Mongo URI before connecting
+if (!process.env.MONGO_URI) {
+  console.error("❌ ERROR: MONGO_URI is missing in your .env file");
+  process.exit(1);
+}
+
+// MongoDB connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+    process.exit(1);
+  });
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  const baseUrl = `http://localhost:${PORT}`;
+  console.log("\n" + "=".repeat(50));
+  console.log("🚀 Server is running!");
   console.log("=".repeat(50));
   console.log(` Server URL: ${baseUrl}`);
   console.log("\n Available Endpoints:");
